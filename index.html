@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fake Review Detector</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+
+body.light-mode {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+
+
+button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #6610f2;
+}
+.card {
+  width: 300px;
+  height: 400px;
+  perspective: 1000px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card:hover .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.card-front {
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.card-back {
+  background-color: #007bff;
+  color: white;
+  transform: rotateY(180deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.typed-text {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  border-right: 0.1em solid black;
+  overflow: hidden;
+}
+
+.typing {
+  animation: typing 3.5s steps(40, end), blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+ /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #000;
+      padding: 1rem 2rem;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: background-color 0.5s ease, transform 0.3s ease;
+    }
+
+    /* Navbar Sticky Effect on Scroll */
+    .navbar.active {
+      background-color: #222;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.1); /* Slightly larger hover effect */
+    }
+
+    .navbar-menu {
+      display: flex;
+      gap: 2rem;
+    }
+
+    /* Enhanced Navbar Buttons */
+    .navbar-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      border: 2px solid transparent;
+      transition: background-color 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
+    }
+
+    .navbar-menu a:hover {
+      background-color: #3498db;
+      border-color: #3498db;
+      transform: scale(1.1); /* Slight hover effect */
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-menu a:active {
+      transform: scale(0.98);
+    }
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-drop-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.drop {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #fff;
+  position: absolute;
+  top: -100px;
+  animation: drop-fall 0.6s forwards, drop-expand-horizontal 0.5s 0.6s forwards; /* Faster animation */
+}
+
+@keyframes drop-fall {
+  0% {
+    top: -100px;
+  }
+  100% {
+    top: 40%;
+  }
+}
+
+@keyframes drop-expand-horizontal {
+  0% {
+    width: 50px;
+    height: 50px;
+  }
+  100% {
+    width: 600px;
+    height: 50px;
+    border-radius: 25px;
+  }
+}
+
+.hero-content {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.6s ease 1.1s, transform 0.6s ease 1.1s; /* Faster appearance */
+  position: relative;
+  transform: translateY(30px);
+}
+
+.hero-content h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-family: 'Roboto', sans-serif;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#typed-text {
+  display: inline-block;
+  border-right: 2px solid #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  animation: typing 1.5s steps(25) forwards; /* Faster typing */
+  animation-delay: 1.1s; /* Delayed slightly to align with drop animation */
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Enhanced CTA Button */
+.cta-button {
+  background: linear-gradient(135deg, #007bff, #6610f2);
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  margin-top: 2rem;
+  display: inline-block;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  background: linear-gradient(135deg, #6610f2, #007bff);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button:active {
+  transform: scale(0.97);
+}
+
+/* Floating Shapes with Faster Animation */
+.floating-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.floating-shapes span {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  animation: float 6s infinite ease-in-out; /* Faster floating shapes */
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-100px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* About Section Enhancements */
+    .about-section {
+      background-color: #fff;
+      padding: 5rem 0;
+      opacity: 1;
+      transition: opacity 1.5s ease, transform 1.5s ease;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    .section-description {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      color: #6c757d;
+    }
+
+    .about-content {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .about-item {
+      flex: 1;
+      max-width: 300px;
+      text-align: center;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .about-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .about-item i {
+      font-size: 3rem;
+      color: #007bff;
+      margin-bottom: 1rem;
+    }
+
+
+.detector-section {
+  background-color: #f8f9fa;
+  padding: 5rem 0;
+  text-align: center;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.detector-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.detector-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.detector-content:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.detector-content textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: border 0.3s ease;
+}
+
+.detector-content textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.analyze-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.analyze-btn:hover {
+  background-color: #6610f2;
+  transform: scale(1.05);
+}
+
+.analyze-btn:focus {
+  outline: 2px solid #6610f2;
+  outline-offset: 2px;
+}
+
+.result-box {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #ecf0f1;
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.result, .confidence {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .detector-section h2 {
+    font-size: 2rem;
+  }
+
+  .detector-content {
+    padding: 1.5rem;
+  }
+
+  .analyze-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+
+  .result, .confidence {
+    font-size: 1rem;
+  }
+}
+
+
+ /* Meet the Team Section */
+/* Meet the Team Section */
+.team-section {
+  background-color: #f8f9fa;
+  padding: 5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.team-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 1.5s ease-in-out;
+}
+
+.team-content {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.team-member {
+  flex: 1;
+  max-width: 300px;
+  text-align: center;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  position: relative; /* Ensures smooth hover effects */
+  z-index: 1;
+}
+
+.team-member:hover {
+  transform: scale(1.05); /* Slight scale for card expansion */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  z-index: 2; /* Ensures the hovered card stays above others */
+}
+
+.team-member img {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.team-member:hover img {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.team-member h3, .team-member p {
+  color: #333;
+}
+
+.details-section {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 70%;
+  max-width: 700px;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.details-section.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.team-content.blur {
+  filter: blur(10px);
+  transition: filter 0.5s ease;
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* Background blur when modal is open */
+.team-content.blur {
+  filter: blur(10px);
+  transition: filter 0.5s ease;
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for entire section */
+.team-member:hover {
+  transform: translateY(-10px);
+}
+
+.team-member:hover img {
+  transform: scale(1.1);
+}
+
+
+
+
+    /* Feedback Form Section */
+    .feedback-section {
+      background-color: #f8f9fa;
+      padding: 5rem 0;
+      text-align: center;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .feedback-section h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    .feedback-form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .feedback-form input, .feedback-form textarea {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+    }
+
+    .feedback-form button {
+      padding: 1rem;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .feedback-form button:hover {
+      background-color: #6610f2;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #343a40;
+      color: #fff;
+      padding: 2rem 0;
+      text-align: center;
+    }
+
+    .footer p {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .footer-icons {
+      margin-top: 1rem;
+    }
+
+    .footer-icons a {
+      margin: 0 10px;
+      color: #fff;
+      font-size: 1.5rem;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .footer-icons a:hover {
+      color: #3498db;
+      transform: scale(1.2);
+    }
+
+    /* Global Animations */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes gradientBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Scroll fade-in effect */
+    section {
+      opacity: 0;
+      transition: opacity 1.5s ease, transform 1.5s ease;
+      transform: translateY(50px);
+    }
+
+    section.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+.floating-shapes span {
+  animation: float 8s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-100px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+</style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="#" class="navbar-brand">Klassmate</a>
+    <ul class="navbar-menu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#feedback">Feedback</a></li>
+    </ul>
+  </nav>
+
+ <!-- Hero Section -->
+<section id="home" class="hero-section">
+  <div class="hero-drop-container">
+    <div class="drop"></div>
+  </div>
+
+  <div class="floating-shapes">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="hero-content">
+    <h1 id="typed-heading"><span id="typed-text">Catch Up on Missed Lectures. Fast.</span></h1>
+    <a href="#platform" class="cta-button" aria-label="Explore Klassmate">Explore Now</a>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section section-light">
+  <div class="container">
+    <h2 class="section-title">About Klassmate</h2>
+    <p class="section-description">
+      Klassmate is an edtech platform that creates university-specific subworlds where students access lectures by peer tutors.
+      Students subscribe for curriculum-based content, while tutors gain recognition, certificates, and valuable experience.
+    </p>
+    <div class="about-content">
+      <div class="about-item">
+        <i class="fas fa-university"></i>
+        <h3>University Subworlds</h3>
+        <p>Each university has its own hub with tailored lecture content.</p>
+      </div>
+      <div class="about-item">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h3>Verified Tutors</h3>
+        <p>Selected through GPA and ID verification for trustworthy academic help.</p>
+      </div>
+      <div class="about-item">
+        <i class="fas fa-user-graduate"></i>
+        <h3>Accessible Learning</h3>
+        <p>Missed a class? Get up to speed with sessions that match your syllabus.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Platform Section -->
+<section id="platform" class="detector-section section-dark">
+  <div class="container">
+    <h2>Lecture Access & Requests</h2>
+    <div class="detector-content">
+      <textarea id="review-input" rows="5" placeholder="Type in the topic or course you need help with..."></textarea>
+      <button class="analyze-btn">Submit Request</button>
+      <div id="ai-result" class="result-box hidden">
+        <p id="result-text">Your request has been received. A tutor will respond soon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Meet the Team Section -->
+<section id="team" class="team-section">
+  <div class="container">
+    <h2>Meet the Team</h2>
+    <div class="team-content">
+      <div class="team-member" data-member-id="member1">
+        <div class="member-image">
+          <img src="member1.jpg" alt="Team Member 1">
+        </div>
+        <h3>Milad </h3>
+        <p>Founder & Academic Lead</p>
+      </div>
+      <div class="team-member" data-member-id="member2">
+        <div class="member-image">
+          <img src="member4.jpg" alt="Team Member 2">
+        </div>
+        <h3>Suneet Rohra</h3>
+        <p>Platform Developer</p>
+      </div>
+      <div class="team-member" data-member-id="member3">
+        <div class="member-image">
+          <img src="member3.jpg" alt="Team Member 3">
+        </div>
+        <h3>Gowtham Suhas</h3>
+        <p>Curriculum Strategist</p>
+      </div>
+      <div class="team-member" data-member-id="member4">
+        <div class="member-image">
+          <img src="member2.jpg" alt="Team Member 4">
+        </div>
+        <h3></h3>
+        <p>Quality Tester</p>
+      </div>
+    </div>
+    <!-- Expanded Member Details Modal -->
+    <div id="member-details" class="details-section">
+      <button class="close-btn" onclick="closeDetails()">×</button>
+      <div class="details-content"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Feedback Form Section -->
+<section id="feedback" class="feedback-section">
+  <div class="container">
+    <h2>We Value Your Feedback</h2>
+    <form class="feedback-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Feedback" rows="5" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2024 Klassmate. All Rights Reserved.</p>
+    <div class="footer-icons">
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+
+
+   // Navbar scrolling effect
+   window.addEventListener('scroll', function () {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+         navbar.classList.add('active');
+      } else {
+         navbar.classList.remove('active');
+      }
+   });
+
+   // Hero animation end event listener
+   document.querySelector('.drop').addEventListener('animationend', function() {
+      const heroContent = document.querySelector('.hero-content');
+      heroContent.style.opacity = '1';
+      heroContent.style.transform = 'translateY(0)';
+   });
+
+   // Scroll fade-in effect for sections
+   window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      const scrollY = window.pageYOffset;
+
+      sections.forEach((section) => {
+         const sectionTop = section.offsetTop - window.innerHeight / 1.3;
+         if (scrollY > sectionTop) {
+            section.classList.add('active');
+         }
+      });
+   });
+
+   // Typed text animation for the hero heading
+   function typeText() {
+      const typedText = document.getElementById('typed-heading');
+      const text = "Analyze a Review in Real Time!";
+      let i = 0;
+      function typingEffect() {
+         if (i < text.length) {
+            typedText.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typingEffect, 100);
+         }
+      }
+      typingEffect();
+   }
+
+   // Start typed text animation when the page loads
+   window.onload = typeText;
+
+   // Confetti effect function
+   function triggerConfetti() {
+      confetti({
+         particleCount: 100,
+         spread: 70,
+         origin: { y: 0.6 }
+      });
+   }
+
+   // Easter egg: Control+Shift+E key combination
+   let keysPressed = {};
+
+   document.addEventListener('keydown', (event) => {
+      keysPressed[event.key.toLowerCase()] = true;
+      if (keysPressed['control'] && keysPressed['shift'] && keysPressed['e']) {
+         alert('Easter Egg Activated!');
+         triggerConfetti();  // Trigger confetti effect
+      }
+   });
+
+   document.addEventListener('keyup', (event) => {
+      delete keysPressed[event.key.toLowerCase()];
+   });
+
+   // Team member details modal
+   document.addEventListener("DOMContentLoaded", function () {
+      const members = document.querySelectorAll(".team-member");
+      const detailsSection = document.getElementById("member-details");
+      const detailsContent = document.querySelector(".details-content");
+      const teamContent = document.querySelector(".team-content");
+
+      members.forEach(member => {
+         member.addEventListener("click", function () {
+            const memberId = this.getAttribute('data-member-id');
+            showDetails(memberId);
+            teamContent.classList.add("blur");
+            detailsSection.classList.add("show");
+         });
+      });
+
+      function showDetails(memberId) {
+         let content = '';
+         switch (memberId) {
+            case 'member1':
+               content = `
+                  <h3>Pavan Modha</h3>
+                  <p>Project Leader</p>
+                  <p>Video Editor | Logbook documentation | Process optimization</p>
+               `;
+               break;
+            case 'member2':
+               content = `
+                  <h3>Suneet Rohra</h3>
+                  <p>Model Developer</p>
+                  <p>Sassy Coder | Project Management and Designing | Marketing and Communication Strategist</p>
+               `;
+               break;
+            case 'member3':
+               content = `
+                  <h3>Sharanya Holla</h3>
+                  <p>Info. Researcher</p>
+                  <p>Data Expert | Research & Data Management</p>
+               `;
+               break;
+            case 'member4':
+               content = `
+                  <h3>Karen Prita</h3>
+                  <p>Tester</p>
+                  <p>Prototype Validation Specialist | Data acquisition and Feedback Optimization</p>
+               `;
+               break;
+            default:
+               content = `<p>Member not found.</p>`;
+               break;
+         }
+         detailsContent.innerHTML = content;
+      }
+
+      window.closeDetails = function() {
+         detailsSection.classList.remove("show");
+         teamContent.classList.remove("blur");
+      };
+   });
+
+   // Hero section animation delay
+   document.addEventListener('DOMContentLoaded', function () {
+      const heroContent = document.querySelector('.hero-content');
+      setTimeout(() => {
+         heroContent.style.opacity = '1';
+         heroContent.style.transform = 'translateY(0)';
+      }, 2000);
+   });
+
+  function analyzeReview() {
+    const review = document.getElementById('review-input').value;
+
+    // Check if the review input is empty
+    if (review === "") {
+        alert("Please provide a review.");
+        return;
+    }
+
+    // Make an AJAX request to the Flask server
+    fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ review: review }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Show the AI result and display the prediction and confidence
+        document.getElementById('ai-result').classList.remove('hidden');
+        document.getElementById('result-text').textContent = `Prediction: ${data.prediction}`;
+        document.getElementById('confidence-text').textContent = `Confidence: ${data.confidence}`;
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`An error occurred: ${error.message}`);
+    });
+}
+
+</script>
+
+
+
+</body>
+</html>
