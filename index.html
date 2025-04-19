@@ -221,6 +221,7 @@ button:hover {
 .drop {
   width: 50px;
   height: 50px;
+  display: none;
   border-radius: 50%;
   background-color: #fff;
   position: absolute;
@@ -311,6 +312,24 @@ button:hover {
 .cta-button:active {
   transform: scale(0.97);
 }
+  .cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cta-button.secondary {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+.cta-button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-5px) scale(1.05);
+}
+
 
 /* Floating Shapes with Faster Animation */
 .floating-shapes {
@@ -895,7 +914,10 @@ button:hover {
 
   <div class="hero-content">
     <h1 id="typed-heading"><span id="typed-text">Catch Up on Missed Lectures. Fast.</span></h1>
-    <a href="#platform" class="cta-button" aria-label="Explore Klassmate">Explore Now</a>
+    <div class="cta-buttons">
+  <a href="#volunteer" class="cta-button">Volunteer</a>
+  <a href="#learn" class="cta-button secondary">Learn</a>
+</div>
   </div>
 </section>
 
